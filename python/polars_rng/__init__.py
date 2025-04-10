@@ -6,6 +6,21 @@ from polars_rng.helpers import into_expr, IntoExpr, sample
 
 # TODO: add mean and variance to docstrings
 
+DISTRIBUTIONS = [
+    "normal",
+    "uniform",
+    "bernoulli",
+    "binomial",
+    "exponential",
+    "poisson",
+    "weibull",
+    "laplace",
+    "gamma",
+    "beta",
+]
+
+__all__ = DISTRIBUTIONS
+
 
 def normal(mu: IntoExpr = 0, sigma: IntoExpr = 1) -> pl.Expr:
     """
