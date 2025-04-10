@@ -1,5 +1,5 @@
 [project]
-name = "polars-rand"
+name = "polars_rng"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -12,8 +12,8 @@ dependencies = [
 ]
 
 [tool.maturin]
-module-name = "polars_rand._core"
-python-packages = ["polars_rand"]
+module-name = "polars_rng._core"
+python-packages = ["polars_rng"]
 python-source = "python"
 profile = "dev" # faster builds, turn off for release
 

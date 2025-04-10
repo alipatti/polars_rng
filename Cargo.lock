@@ -1480,7 +1480,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "polars_rand"
+name = "polars_rng"
 version = "0.1.0"
 dependencies = [
  "polars-arrow",

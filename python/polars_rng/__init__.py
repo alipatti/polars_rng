@@ -1,8 +1,6 @@
 import polars as pl
 
-from polars_rand.helpers import into_expr, IntoExpr, sample
-
-# TODO: write docstrings
+from polars_rng.helpers import into_expr, IntoExpr, sample
 
 # TODO: multivariate normal
 

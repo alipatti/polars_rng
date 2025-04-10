@@ -2,10 +2,8 @@ import pytest
 from math import sqrt
 from typing import Any, Callable, Union
 import polars as pl
-from polars.testing import assert_frame_equal
 
-import polars_rand as plr
-from polars_rand.helpers import IntoExpr
+import polars_rng as plr
 
 
 # TODO: set a seed
