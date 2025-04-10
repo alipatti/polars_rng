@@ -32,7 +32,7 @@ def sample(
 ) -> pl.Expr:
     return pl.plugins.register_plugin_function(
         plugin_path=LIB,
-        args=[*expressions, DUMMY_EXPR],
+        args=expressions or DUMMY_EXPR,
         kwargs=dict(distribution=distribution),
         function_name="sample",
         is_elementwise=True,
