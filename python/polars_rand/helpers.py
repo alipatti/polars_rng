@@ -10,7 +10,7 @@ IntoExpr = Union[pl.Expr, str, int, float]
 # we must pass at least one expression to the plugin so that
 # the rust code knows length of data it should generate
 # PERF: generating this expression and then immediately binning it is very wasteful
-DUMMY_EXPR = pl.int_range(pl.len())
+DUMMY_EXPR = pl.repeat(None, pl.len())
 
 
 def into_expr(expr: IntoExpr, dtype: Optional[PolarsDataType] = None) -> pl.Expr:
@@ -18,7 +18,7 @@ def into_expr(expr: IntoExpr, dtype: Optional[PolarsDataType] = None) -> pl.Expr
         expr = pl.col(expr)
 
     if isinstance(expr, (int, float)):
-        expr = pl.lit(expr)
+        expr = pl.repeat(expr, pl.len())
 
     return expr if dtype is None else expr.cast(dtype)
 
