@@ -1,4 +1,3 @@
-from math import pi
 import polars as pl
 
 from polars_rand.helpers import into_expr, IntoExpr, sample
@@ -6,13 +5,13 @@ from polars_rand.helpers import into_expr, IntoExpr, sample
 # TODO: write docstrings
 
 
-def normal(mean: IntoExpr = 0, variance: IntoExpr = 1) -> pl.Expr:
-    return sample("standard_normal") * into_expr(variance) + into_expr(mean)
+def normal(mean: IntoExpr = 0, std_dev: IntoExpr = 1) -> pl.Expr:
+    return sample("standard_normal") * into_expr(std_dev) + into_expr(mean)
 
 
 def uniform(low: IntoExpr = 0, high: IntoExpr = 1) -> pl.Expr:
     low, high = into_expr(low), into_expr(high)
-    return low + sample("standard_uniform") * (high - low)
+    return sample("standard_uniform") * (high - low) + low
 
 
 def bernoulli(p: IntoExpr = 0.5) -> pl.Expr:
@@ -37,17 +36,9 @@ def weibull(scale: IntoExpr = 1, shape: IntoExpr = 1):
     return exponential(scale).pow(shape)
 
 
-def cauchy(
-    # TODO: figure out how to sample arbitrary parameters
-    # x_0: IntoExpr,
-    # gamma: IntoExpr,
-):
-    return normal() / normal()
-
-
 def laplace(mean: IntoExpr = 0, scale: IntoExpr = 1):
     u = uniform(-1, 1)
-    return into_expr(mean) - into_expr(scale) * u.sign() * (1 - u.abs()).log()
+    return u.sign() * into_expr(scale) * (1 - u.abs()).log() + into_expr(mean)
 
 
 def gamma(shape: IntoExpr, scale: IntoExpr):
@@ -56,6 +47,5 @@ def gamma(shape: IntoExpr, scale: IntoExpr):
 
 
 def beta(alpha: IntoExpr, beta: IntoExpr):
-    x = gamma(alpha, 1)
-    y = gamma(beta, 1)
-    return x / (x + y)
+    alpha, beta = into_expr(alpha, pl.Float64), into_expr(beta, pl.Float64)
+    return sample("beta", alpha, beta)

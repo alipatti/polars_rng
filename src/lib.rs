@@ -4,7 +4,7 @@ use pyo3_polars::derive::polars_expr;
 use rand::prelude::Distribution as _;
 use rand::rngs::ThreadRng;
 use serde::Deserialize;
-use statrs::distribution::{Binomial, Gamma, Normal, Poisson, Uniform};
+use statrs::distribution::{Beta, Binomial, Gamma, Normal, Poisson, Uniform};
 
 #[derive(Deserialize)]
 struct SampleKwargs {
@@ -19,6 +19,7 @@ enum Distribution {
     Binomial,
     Gamma,
     Poisson,
+    Beta,
 }
 
 // TODO: refactor this function (tons of repetition, but i also wrote in one evening so i don't
@@ -36,7 +37,7 @@ fn sample(inputs: &[Series], kwargs: SampleKwargs) -> PolarsResult<Series> {
             let iter = dist.sample_iter(&mut rng).take(n);
             ChunkedArray::<Float64Type>::from_iter_values("sample".into(), iter)
         }
-        // can use downstream for bern, exp
+        // can use downstream for bern, exp, etc.
         Distribution::StandardUniform => {
             let dist = Uniform::new(0.0, 1.0).unwrap(); // U(0, 1) will never fail
             let iter = dist.sample_iter(&mut rng).take(n);
@@ -64,15 +65,34 @@ fn sample(inputs: &[Series], kwargs: SampleKwargs) -> PolarsResult<Series> {
             let scales = inputs[1].f64()?;
 
             let iter =
-                scales.iter().zip(shapes.iter()).map(|(alpha, theta)| {
+                shapes.iter().zip(scales.iter()).map(|(alpha, theta)| {
                     if let (Some(alpha), Some(theta)) = (alpha, theta) {
-                        Gamma::new(alpha, theta)
+                        Gamma::new(alpha, 1.0 / theta)
                             .ok()
                             .map(|dist| dist.sample(&mut rng))
                     } else {
                         None
                     }
                 });
+
+            ChunkedArray::<Float64Type>::from_iter_options(
+                "sample".into(),
+                iter,
+            )
+        }
+        Distribution::Beta => {
+            let alpha = inputs[0].f64()?;
+            let beta = inputs[1].f64()?;
+
+            let iter = alpha.iter().zip(beta.iter()).map(|(alpha, beta)| {
+                if let (Some(alpha), Some(beta)) = (alpha, beta) {
+                    Beta::new(alpha, beta)
+                        .ok()
+                        .map(|dist| dist.sample(&mut rng))
+                } else {
+                    None
+                }
+            });
 
             ChunkedArray::<Float64Type>::from_iter_options(
                 "sample".into(),
