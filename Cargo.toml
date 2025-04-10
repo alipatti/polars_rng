@@ -1,0 +1,20 @@
+[package]
+name = "polars_rand"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "_core"
+# "cdylib" is necessary to produce a shared library for Python to import from.
+crate-type = ["cdylib"]
+
+[dependencies]
+polars-arrow = "0.46.0"
+polars-core = "0.46.0"
+# "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
+# "abi3-py39" tells pyo3 (and maturin) to build using the stable ABI with minimum Python version 3.9
+pyo3 = { version = "0.23", features = ["extension-module", "abi3-py39"] }
+pyo3-polars = { version = "0.20.0", features = ["derive"] }
+rand = "0.8.5"
+serde = { version = "1.0.219", features = ["derive"] }
+statrs = { version = "0.18.0", features = ["rand"] }
