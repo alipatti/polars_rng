@@ -1,12 +1,12 @@
 [project]
 name = "polars_rng"
 version = "0.1.0"
-description = "Add your description here"
+description = "Random number generation as polars expressions"
 readme = "README.md"
 authors = [
     { name = "Alistair Pattison", email = "alistairpattison@gmail.com" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
     "polars>=1.27.0",
 ]
