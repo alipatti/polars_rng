@@ -1,12 +1,14 @@
+from typing import Any, Sequence, Union
 import polars as pl
 
 from polars_rng.helpers import into_expr, IntoExpr, sample
+from polars.datatypes import DataTypeClass
 
 # TODO: multivariate normal
 
 # TODO: add mean and variance to docstrings
 
-DISTRIBUTIONS = [
+__all__ = [
     "normal",
     "uniform",
     "bernoulli",
@@ -19,7 +21,7 @@ DISTRIBUTIONS = [
     "beta",
 ]
 
-__all__ = DISTRIBUTIONS
+DISTRIBUTIONS = __all__
 
 
 def normal(mu: IntoExpr = 0, sigma: IntoExpr = 1) -> pl.Expr:
@@ -37,6 +39,56 @@ def uniform(low: IntoExpr = 0, high: IntoExpr = 1) -> pl.Expr:
     """
     low, high = into_expr(low), into_expr(high)
     return sample("standard_uniform") * (high - low) + low
+
+
+def uniform_integer(
+    low: IntoExpr,
+    high: IntoExpr,
+    output_dtype: DataTypeClass = pl.UInt64,
+    include_right=False,
+) -> pl.Expr:
+    """
+    Samples uniformly from `{low, low + 1, ..., high - 1}` if `include_right` is `False` (default) or from `{low, low + 1, ..., high - 1}` if `include_right` is `True`.
+    """
+
+    return uniform(low, into_expr(high) + int(include_right)).cast(output_dtype)
+
+
+def categorical(
+    *,
+    categories: Union[tuple[Any, ...], str, pl.Expr, None] = None,
+    weights: Union[
+        Union[tuple[int, ...], tuple[float, ...]], str, pl.Expr, None
+    ] = None,
+):
+    if isinstance(categories, Sequence):
+        categories = pl.repeat(
+            list(categories), dtype=pl.List(type(categories[0])), n=pl.len()
+        )
+    elif isinstance(categories, (str, pl.Expr)):
+        categories = into_expr(categories)
+
+    if isinstance(weights, Sequence):
+        weights = pl.repeat(list(weights), dtype=pl.List(float), n=pl.len())
+    elif isinstance(weights, (str, pl.Expr)):
+        weights = into_expr(weights)
+
+    if categories is None:
+        # take number of categories from probabilities
+        if isinstance(weights, Sequence):
+            categories = pl.int_ranges(0, len(weights))
+        elif isinstance(weights, (str, pl.Expr)):
+            categories = pl.int_ranges(0, into_expr(weights).list.len())
+        else:
+            raise ValueError("must provide at least one of categories or probabilities")
+
+    if weights is None:
+        sample_indices = uniform_integer(0, categories.list.len())
+    else:
+        cdf = weights.list.eval(pl.element().cum_sum() / pl.element().sum())
+        sample_indices = cdf.list.eval(pl.element().search_sorted(uniform()))
+
+    return categories.list.get(sample_indices).alias("sample")
 
 
 def bernoulli(p: IntoExpr = 0.5) -> pl.Expr:
