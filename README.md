@@ -5,12 +5,7 @@ Please open an issue or pull request if there's a distribution you'd like implem
 
 ## Installation
 
-Many of the included distributions are implemented in Rust, so you'll need an [up-to-date Rust compiler](https://rust-lang.org/tools/install/) to install this package.
-
 ```bash
-# install the rust compiler if you haven't already
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
 # then install this package with pip
 pip install git+https://github.com/alipatti/polars_rng
 
