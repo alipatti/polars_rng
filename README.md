@@ -6,7 +6,7 @@ Please open an issue or pull request if there's a distribution you'd like implem
 ## Installation
 
 ```bash
-# then install this package with pip
+# with pip
 pip install git+https://github.com/alipatti/polars_rng
 
 # or with uv
