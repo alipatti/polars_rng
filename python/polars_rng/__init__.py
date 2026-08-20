@@ -1,8 +1,16 @@
+import warnings
 from typing import Any, Sequence, Union
 import polars as pl
 
 from polars_rng.helpers import into_expr, IntoExpr, sample
 from polars.datatypes import DataTypeClass
+
+warnings.warn(
+    "polars_rng is deprecated; use polars-stats instead: "
+    "https://github.com/FBruzzesi/polars-stats",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 # TODO: multivariate normal
 

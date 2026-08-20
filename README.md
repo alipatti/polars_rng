@@ -1,5 +1,8 @@
 # polars_rng
 
+> [!WARNING]
+> This package is deprecated. Please use [polars-stats](https://github.com/FBruzzesi/polars-stats) instead.
+
 This package provides Polars expressions for generating random numbers according to various probability distributions (see the full list at the bottom of this page).
 Please open an issue or pull request if there's a distribution you'd like implemented!
 
